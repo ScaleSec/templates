@@ -1,0 +1,199 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Sample NACL to prevent some insecure services. Associate this NACL with VPC subnets after deployment. Useful to comply with organizational policy or compliance requirements. Inspired by PCI DSS v3.0 requirement 1.1.6. This NACL configuration blocks default ports for insecure services, and therefore should complement security groups and diligent monitoring.",
+  "Parameters": {
+    "VpcId": {
+      "Type": "AWS::EC2::VPC::Id",
+      "Description" : "Existing VPC ID",
+      "AllowedPattern" : "^vpc-[0-9a-z]{8}"  
+    }
+  },
+  "Resources": {
+    "GuardrailNacl": {
+      "Type": "AWS::EC2::NetworkAcl",
+      "Properties": {
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "Guardrail NACL"
+          }
+        ],
+        "VpcId": {
+          "Ref": "VpcId"
+        }
+      }
+    },
+    "NoFtpIngress": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "CidrBlock": "0.0.0.0/0",
+        "Egress": false,
+        "NetworkAclId": {
+          "Ref": "GuardrailNacl"
+        },
+        "PortRange": { "From" : "20", "To" : "21" },
+        "Protocol": 6,
+        "RuleAction": "Deny",
+        "RuleNumber": 100
+      }
+    },
+    "NoFtpEgress": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "CidrBlock": "0.0.0.0/0",
+        "Egress": true,
+        "NetworkAclId": {
+          "Ref": "GuardrailNacl"
+        },
+        "PortRange": { "From" : "20", "To" : "21" },
+        "Protocol": 6,
+        "RuleAction": "Deny",
+        "RuleNumber": 100
+      }
+    },
+    "NoTelnetIngress": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "CidrBlock": "0.0.0.0/0",
+        "Egress": false,
+        "NetworkAclId": {
+          "Ref": "GuardrailNacl"
+        },
+        "PortRange": { "From" : "23", "To" : "23" },
+        "Protocol": 6,
+        "RuleAction": "Deny",
+        "RuleNumber": 110
+      }
+    },
+    "NoTelnetEgress": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "CidrBlock": "0.0.0.0/0",
+        "Egress": true,
+        "NetworkAclId": {
+          "Ref": "GuardrailNacl"
+        },
+        "PortRange": { "From" : "23", "To" : "23" },
+        "Protocol": 6,
+        "RuleAction": "Deny",
+        "RuleNumber": 110
+      }
+    },
+    "NoPop3Ingress": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "CidrBlock": "0.0.0.0/0",
+        "Egress": false,
+        "NetworkAclId": {
+          "Ref": "GuardrailNacl"
+        },
+        "PortRange": { "From" : "110", "To" : "110" },
+        "Protocol": 6,
+        "RuleAction": "Deny",
+        "RuleNumber": 120
+      }
+    },
+    "NoPop3Egress": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "CidrBlock": "0.0.0.0/0",
+        "Egress": true,
+        "NetworkAclId": {
+          "Ref": "GuardrailNacl"
+        },
+        "PortRange": { "From" : "110", "To" : "110" },
+        "Protocol": 6,
+        "RuleAction": "Deny",
+        "RuleNumber": 120
+      }
+    },
+    "NoImapIngress": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "CidrBlock": "0.0.0.0/0",
+        "Egress": false,
+        "NetworkAclId": {
+          "Ref": "GuardrailNacl"
+        },
+        "PortRange": { "From" : "143", "To" : "143" },
+        "Protocol": 6,
+        "RuleAction": "Deny",
+        "RuleNumber": 130
+      }
+    },
+    "NoImapEgress": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "CidrBlock": "0.0.0.0/0",
+        "Egress": true,
+        "NetworkAclId": {
+          "Ref": "GuardrailNacl"
+        },
+        "PortRange": { "From" : "143", "To" : "143" },
+        "Protocol": 6,
+        "RuleAction": "Deny",
+        "RuleNumber": 130
+      }
+    },
+    "NoInsecureSnmpIngress": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Metadata": {
+        "Notes": "SNMPv3 with TLS uses 10161/10162 per https://tools.ietf.org/html/rfc6353"
+      },
+      "Properties": {
+        "CidrBlock": "0.0.0.0/0",
+        "Egress": false,
+        "NetworkAclId": {
+          "Ref": "GuardrailNacl"
+        },
+        "PortRange": { "From" : "161", "To" : "162" },
+        "Protocol": 17,
+        "RuleAction": "Deny",
+        "RuleNumber": 140
+      }
+    },
+    "NoInsecureSnmpEgress": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Metadata": {
+        "Notes": "SNMPv3 with TLS uses 10161/10162 per https://tools.ietf.org/html/rfc6353"
+      },
+      "Properties": {
+        "CidrBlock": "0.0.0.0/0",
+        "Egress": true,
+        "NetworkAclId": {
+          "Ref": "GuardrailNacl"
+        },
+        "PortRange": { "From" : "161", "To" : "162" },
+        "Protocol": 17,
+        "RuleAction": "Deny",
+        "RuleNumber": 140
+      }
+    },
+    "DefaultAllowIngress": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "CidrBlock": "0.0.0.0/0",
+        "Egress": false,
+        "NetworkAclId": {
+          "Ref": "GuardrailNacl"
+        },
+        "Protocol": -1,
+        "RuleAction": "Allow",
+        "RuleNumber": 32766
+      }
+    },
+    "DefaultAllowEgress": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "CidrBlock": "0.0.0.0/0",
+        "Egress": true,
+        "NetworkAclId": {
+          "Ref": "GuardrailNacl"
+        },
+        "Protocol": -1,
+        "RuleAction": "Allow",
+        "RuleNumber": 32766
+      }
+    }
+  }
+}
