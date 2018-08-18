@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # usage:
-# $ ./list_user_permissions.sh [org|project] [user_email]
+# $ ./list_user_permissions.sh [user_email]
 
 ORG_ID="340752610930"
 PROJ_ID="scalesec-dev"
