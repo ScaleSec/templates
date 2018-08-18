@@ -3,7 +3,7 @@
 # usage:
 # $ ./list_user_permissions.sh [user_email]
 
-ORG_ID="340752610930"
+ORG_ID="[insert your org id]"
 PROJ_ID="scalesec-dev"
 
 # paramaterize username
